@@ -1,0 +1,11 @@
+Transformers for Image Recognition at Scale
+https://arxiv.org/pdf/2010.11929.pdf 
+
+Large Action Model
+https://arxiv.org/pdf/2211.15603.pdf 
+
+Neural Symbolic Ai
+https://arxiv.org/pdf/2305.00813.pdf  
+
+
+
