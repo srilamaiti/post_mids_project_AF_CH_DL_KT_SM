@@ -21,7 +21,7 @@ from .TransformerBlock import TransformerEncoder
 
 
 class ViT(nn.Module):
-    def __init__(self, *,
+    def __init__(self,
                  img_dim,
                  in_channels=3,
                  patch_dim=16,
@@ -51,7 +51,7 @@ class ViT(nn.Module):
                 transformer {nn.Module, default: None, Optional}: transformer block to use
                 classification {bool, default: True}: creates an extra CLS token
         """
-        super().__init__()                  # inherit from nn.Module   
+        super(ViT, self).__init__()                  # inherit from nn.Module   
         assert img_dim % patch_dim == 0, f"patch size {patch_dim} not divisible"
         
         self.p = patch_dim                                  # patch dimension

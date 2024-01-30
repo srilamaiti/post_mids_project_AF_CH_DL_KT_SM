@@ -18,7 +18,7 @@ from .MultiHeadedSelfAttention import MultiHeadedSelfAttention
 
 
 class TransfomerBlock(nn.Module):
-    def __init__(self, dim, heads=8, dim_heads=None, dim_linear_block=1024, dropout=0.1, activation=nn.GELU()):
+    def __init__(self, dim, heads=8, dim_heads=None, dim_linear_block=1024, dropout=0.1, activation=nn.GELU):
         """
             Implementation of the base transformer block
             --------------------------------------------
@@ -31,7 +31,7 @@ class TransfomerBlock(nn.Module):
                 activation {torch.nn.activation, default: nn.GELU()}: activation function to use
         """
 
-        super().__init__()                  # inherit from nn.Module
+        super(TransfomerBlock, self).__init__()                  # inherit from nn.Module
         self.attention = MultiHeadedSelfAttention(dim=dim, heads=heads, dim_heads=dim_heads)   # multi-headed self attention layer
         self.dropout = nn.Dropout(dropout)
         self.norm_1 = nn.LayerNorm(dim)      # layer normalization 1
@@ -84,7 +84,7 @@ class TransformerEncoder(nn.Module):
                 dropout {float, default: 0.1}: dropout rate
         """
 
-        super().__init__()                  # inherit from nn.Module
+        super(TransformerEncoder, self).__init__()                  # inherit from nn.Module
         self.blocks = nn.ModuleList(
             [
                 TransfomerBlock(

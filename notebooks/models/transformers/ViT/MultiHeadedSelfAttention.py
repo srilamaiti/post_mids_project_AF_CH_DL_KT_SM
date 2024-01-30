@@ -31,7 +31,7 @@ class MultiHeadedSelfAttention(nn.Module):
             Outputs:
                 out {tensor}: output of the self attention layer
         """
-        super().__init__()                  # inherit from nn.Module
+        super(MultiHeadedSelfAttention, self).__init__()                  # inherit from nn.Module
         self.dim = dim                      # token dimension
         self.heads = heads                  # number of heads
         self.dim_heads = (dim // heads) if dim_heads is None else dim_heads     # dimension of each head
@@ -47,7 +47,7 @@ class MultiHeadedSelfAttention(nn.Module):
         self.scale = self.dim_heads ** -0.5
 
         # Step 3. Define the fully connected layer to convert the concatenated heads back to the original embed_size
-        self.fc_out (_dim, dim, bias=False)
+        self.fc_out = nn.Linear(_dim, dim, bias=False)
 
 
     def forward(self, x, mask=None):
