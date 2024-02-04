@@ -12,3 +12,6 @@ https://openreview.net/pdf?id=liuqDwmbQJ
 
 A Space-Time Diffusion Model for Video Generation
 https://arxiv.org/pdf/2401.12945.pdf
+
+VATT: Transformers for Multimodal Self-Supervised Learning from Raw Video, Audio and Text
+https://arxiv.org/abs/2104.11178
