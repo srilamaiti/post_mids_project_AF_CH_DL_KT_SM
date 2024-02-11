@@ -17,7 +17,7 @@ import torch.nn as nn
 from einops import rearrange
 
 # local imports
-from .TransformerBlock import TransformerEncoder
+from .utils.TransformerBlock import TransformerEncoder
 
 
 class ViT(nn.Module):
