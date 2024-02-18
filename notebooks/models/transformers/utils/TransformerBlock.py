@@ -57,7 +57,6 @@ class TransfomerBlock(nn.Module):
                 out {tensor}: output of the self attention layer
         """
 
-
         # start the attention layer
         attention = self.attention(x, mask)
         
