@@ -13,7 +13,11 @@ import numpy as np
 from pathlib import Path
 
 class VideoLoader(torch.utils.data.Dataset):
-    def __init__(self, csv_path, root_dir):
+    def __init__(self, csv_path, 
+                 root_dir, 
+                 video_id_col='url', 
+                 label_col='clean_text',
+                 split=True):
         """
             DataLoader Class Constructor
             -------------------------------------------
@@ -23,6 +27,9 @@ class VideoLoader(torch.utils.data.Dataset):
         """
         self.metadata = pd.read_csv(csv_path)
         self.root_dir = root_dir
+        self.video_id_col = video_id_col
+        self.label_col = label_col
+        self.split = split
 
 
     def __getitem__(self, idx):
@@ -36,12 +43,15 @@ class VideoLoader(torch.utils.data.Dataset):
                 label {int}: label of the video
         """
         # get the link and id of the video
-        link = self.metadata['url'].iloc[idx]
-        id = link.split('=')[1]
-        label = self.metadata['clean_text'].iloc[idx]
+        link = self.metadata[self.video_id_col].iloc[idx]
+        if self.split:
+            id = link.split('=')[1]
+        else:
+            id = link
+        label = self.metadata[self.label_col].iloc[idx]
 
         # intialize video capture object
-        vc = cv2.VideoCapture(self.root_dir + id + '.mp4')
+        vc = cv2.VideoCapture(f'{self.root_dir}/{id}.mp4')
 
         # calculate total number of frames in the video
         total_frames = int(vc.get(cv2.CAP_PROP_FRAME_COUNT))
