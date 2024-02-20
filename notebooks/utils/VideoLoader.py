@@ -1,57 +1,110 @@
-"""
-    Module to load videos from a given path 
-    then create a dataset using pytorch framework
-"""
-# imoport necessary libraries
-import torch
-import torchvision as tv
-import cv2
-
-import pandas as pd
-import numpy as np
-
+# system libraries
+import os
+import os.path
 from pathlib import Path
 
+# data processing libraries
+import pandas as pd
+import numpy as np
+import cv2
+
+# pytorch libraries
+import torch
+import torchvision as tv
+
+from typing import Dict, Any
+
+
+class VideoRecord(object):
+    def __init__(self, root_path, row):
+        """
+            VideoRecord Class Constructor
+            This class represent a video sample's metadata
+            -----------------------------------------------
+            Inputs:
+                root_path {str}: the system path to the root directory containing the videos
+                row {List}: a list containing records of video elements
+                    1. video_name {str}: the name of the video
+                    2. start_frame {int}: the starting frame of the video
+                    3. end_frame {int}: the ending frame of the video
+                    4. label {int}: the label/annotation of the video
+        """
+        self._path = os.path.join(root_path, f"{row[0]}.mp4")
+        self._data = row
+
+
+    @property
+    def path(self) -> str:
+        return self._path
+    
+
+    @property
+    def num_frames(self) -> int:
+        return np.floor(self.end_frame) - np.ceil(self.start_frame) + 1 # inclusive
+    
+
+    @property
+    def start_frame(self) -> int:
+        return int(self._data[1])
+    
+
+    @property
+    def end_frame(self) -> int:
+        return int(self._data[2])
+    
+
+    @property
+    def label(self) -> Any:
+        return self._data[3]
+
+
 class VideoLoader(torch.utils.data.Dataset):
-    def __init__(self, csv_path, 
-                 root_dir, 
-                 video_id_col='url', 
-                 label_col='clean_text',
-                 split=True):
+    def __init__(self, 
+                 root_path: str,
+                 metadata: np.ndarray):
         """
             DataLoader Class Constructor
             -------------------------------------------
             Inputs:
-                csv_path {str}: path to csv file metadata
-                root_dir  {list}: directory with all the videos
+                root_path  {list}: directory with all the videos
+                metadata {str}: 2D array containing the metadata of the videos in the following format:
+                                1. video_name {str}: the name of the video  (column 0)
+                                2. start_frame {int}: the starting frame of the video (column 1)
+                                3. end_frame {int}: the ending frame of the video (column 2)
+                                4. label {int}: the label/annotation of the video (column 3)
         """
-        self.metadata = pd.read_csv(csv_path)
-        self.root_dir = root_dir
-        self.video_id_col = video_id_col
-        self.label_col = label_col
-        self.split = split
+        self.root_path = root_path
+        self.metadata = metadata
+    
+        # parse metadata into a list of video records
+        self._parse_metadata()
 
 
-    def __getitem__(self, idx):
+    def _parse_metadata(self):
+        """
+            Method to parse the metadata numpy array into a list of video record
+        """
+        self.video_list = [VideoRecord(self.root_path, row) for row in self.metadata]
+
+
+    def __getitem__(self, idx: int) -> Dict[str, Any]:
         """
             Method to get the item at the given index
             -------------------------------------------
             Inputs:
                 index {int}: index of the item
             Outputs:
-                video {tensor}: tensor of the video
-                label {int}: label of the video
+                Dictionary Containing:
+                    video {tensor}: tensor of the video
+                    label {int}: label of the video
         """
-        # get the link and id of the video
-        link = self.metadata[self.video_id_col].iloc[idx]
-        if self.split:
-            id = link.split('=')[1]
-        else:
-            id = link
-        label = self.metadata[self.label_col].iloc[idx]
+        # get the video name and the associated label
+        record: VideoRecord = self.video_list[idx]
+        video_name = record._path
+        label = record.label
 
         # intialize video capture object
-        vc = cv2.VideoCapture(f'{self.root_dir}/{id}.mp4')
+        vc = cv2.VideoCapture(video_name)
 
         # calculate total number of frames in the video
         total_frames = int(vc.get(cv2.CAP_PROP_FRAME_COUNT))
