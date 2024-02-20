@@ -140,9 +140,13 @@ class VideoFrameDataset(torch.utils.data.Dataset):
                     # convert frame to color and to tensor
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     frames.append(frame)
+                    
+                    # increment the frame index
+                    vc.set(cv2.CAP_PROP_POS_FRAMES, i)
+                    i += 1
 
-        # release the video object
-        vc.release()
+            # release the video object
+            vc.release()
         return frames
 
 
